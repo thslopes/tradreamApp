@@ -1,10 +1,9 @@
-async function getKlines(symbol, interval, limit) {
-    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+async function getKlines(symbol, interval) {
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=30`;
     const response = await fetch(url);
     const data = await response.json();
     return data;
 }
-
 function calculateBollingerBands(klines, period = 20, deviation = 2) {
     const closePrices = klines.map((kline) => parseFloat(kline[4]));
 
@@ -37,3 +36,75 @@ function calculateBollingerBands(klines, period = 20, deviation = 2) {
     return { movingAverages, upperBands, lowerBands };
 }
 
+async function doCalculate() {
+    const symbol = document.getElementById("symbol").value;
+    const klines = await getKlines(symbol, "5m");
+    const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines);
+
+    const chartElement = document.getElementById("chart");
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
+
+    const labels = klines.map(kline => new Date(kline[0]));
+    const closePrices = klines.map(kline => kline[4]);
+
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: "Close Price",
+                data: closePrices,
+                borderColor: "rgb(54, 162, 235)",
+                tension: 0.1,
+            },
+            {
+                label: "Moving Average",
+                data: movingAverages,
+                borderColor: "rgb(255, 99, 132)",
+                fill: false,
+                tension: 0.1,
+            },
+            {
+                label: "Upper Band",
+                data: upperBands,
+                borderColor: "rgb(75, 192, 192)",
+                fill: false,
+                tension: 0.1,
+            },
+            {
+                label: "Lower Band",
+                data: lowerBands,
+                borderColor: "rgb(153, 102, 255)",
+                fill: false,
+                tension: 0.1,
+            },
+        ],
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 5
+                    },
+                    time: {
+                        // Luxon format string
+                        tooltipFormat: 'HH mm'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            },
+        },
+    };
+
+    window.myChart = new Chart(chartElement, config);
+}
