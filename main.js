@@ -37,23 +37,14 @@ function calculateBollingerBands(klines, period = 20, deviation = 2) {
 }
 
 async function doCalculate() {
+    const symbol = document.getElementById("symbol").value;
+    const klines = await getKlines(symbol, "5m");
+    const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines);
+
     const chartElement = document.getElementById("chart");
     if (window.myChart) {
         window.myChart.destroy();
     }
-    window.myChart = await calculate("BNBBTC", chartElement);
-    
-    const chartElement2 = document.getElementById("chart2");
-    if (window.myChart2) {
-        window.myChart2.destroy();
-    }
-    window.myChart2 = await calculate("BTCUSDT", chartElement2);
-}
-
-async function calculate(symbol, chartElement) {
-    const klines = await getKlines(symbol, "5m");
-    const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines);
-
 
     const labels = klines.map(kline => new Date(kline[0]));
     const closePrices = klines.map(kline => kline[4]);
@@ -62,7 +53,7 @@ async function calculate(symbol, chartElement) {
         labels: labels,
         datasets: [
             {
-                label: symbol,
+                label: "Close Price",
                 data: closePrices,
                 borderColor: "rgb(54, 162, 235)",
                 tension: 0.1,
@@ -115,5 +106,5 @@ async function calculate(symbol, chartElement) {
         },
     };
 
-    return new Chart(chartElement.getContext('2d'), config);
+    window.myChart = new Chart(chartElement, config);
 }
