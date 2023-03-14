@@ -35,7 +35,10 @@
   <h1>Bollinger Bands Chart</h1>
   <form>
     <label for="symbol">Symbol:</label>
-    <input type="text" id="symbol" name="symbol" value="BNBBTC" /><br /><br />
+    <select id="symbol">
+      <option value="BNBBTC">BNBBTC</option>
+      <option value="BTCUSDT">BTCUSDT</option>
+    </select><br /><br />
     <button type="button" onclick="doCalculate()">Calculate</button>
   </form>
 
