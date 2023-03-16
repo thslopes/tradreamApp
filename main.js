@@ -1,5 +1,5 @@
 async function getKlines(symbol, interval) {
-    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=30`;
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=50`;
     const response = await fetch(url);
     const data = await response.json();
     return data;
