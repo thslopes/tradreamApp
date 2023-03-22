@@ -4,7 +4,7 @@ async function getKlines(symbol, interval) {
     const data = await response.json();
     return data;
 }
-function calculateBollingerBands(closeProces, period = 20, deviation = 2) {
+function calculateBollingerBands(closePrices, period = 20, deviation = 2) {
     const movingAverages = [];
     const upperBands = [];
     const lowerBands = [];
