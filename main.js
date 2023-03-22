@@ -4,9 +4,7 @@ async function getKlines(symbol, interval) {
     const data = await response.json();
     return data;
 }
-function calculateBollingerBands(klines, period = 20, deviation = 2) {
-    const closePrices = klines.map((kline) => parseFloat(kline[4]));
-
+function calculateBollingerBands(closeProces, period = 20, deviation = 2) {
     const movingAverages = [];
     const upperBands = [];
     const lowerBands = [];
@@ -38,16 +36,17 @@ function calculateBollingerBands(klines, period = 20, deviation = 2) {
 
 async function doCalculate() {
     const symbol = document.getElementById("symbol").value;
-    const klines = await getKlines(symbol, "5m");
-    const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines);
+    let klines = await getKlines(symbol, "5m");
+    klines = transformKlinesResponse(klines);
+    const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines.close);
 
     const chartElement = document.getElementById("chart");
     if (window.myChart) {
         window.myChart.destroy();
     }
 
-    const labels = klines.map(kline => new Date(kline[0]));
-    const closePrices = klines.map(kline => kline[4]);
+    const labels = kline.date;
+    const closePrices = klines.close;
 
     const data = {
         labels: labels,
@@ -108,3 +107,29 @@ async function doCalculate() {
 
     window.myChart = new Chart(chartElement, config);
 }
+
+function transformKlinesResponse(response) {
+    const openPrices = [];
+    const closePrices = [];
+    const highPrices = [];
+    const lowPrices = [];
+    const dates = [];
+  
+    for (let i = 0; i < response.length; i++) {
+      const kline = response[i];
+      openPrices.push(parseFloat(kline[1]));
+      highPrices.push(parseFloat(kline[2]));
+      lowPrices.push(parseFloat(kline[3]));
+      closePrices.push(parseFloat(kline[4]));
+      dates.push(new Date(kline[0]));
+    }
+  
+    return {
+      open: openPrices,
+      close: closePrices,
+      high: highPrices,
+      low: lowPrices,
+      date: dates,
+    };
+  }
+  
