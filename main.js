@@ -45,8 +45,8 @@ async function doCalculate() {
         window.myChart.destroy();
     }
 
-    const labels = kline.date;
-    const tclosePrices = klines.close;
+    const labels = klines.date;
+    const closePrices = klines.close;
 
     const data = {
         labels: labels,
