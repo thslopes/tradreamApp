@@ -46,7 +46,7 @@ async function doCalculate() {
     }
 
     const labels = kline.date;
-    const closePrices = klines.close;
+    const tclosePrices = klines.close;
 
     const data = {
         labels: labels,
@@ -106,6 +106,9 @@ async function doCalculate() {
     };
 
     window.myChart = new Chart(chartElement, config);
+    klines.upper = upperBands;
+    klines.lower = lowerBands;
+    plotCandles(klines);
 }
 
 function transformKlinesResponse(response) {
@@ -131,5 +134,55 @@ function transformKlinesResponse(response) {
       low: lowPrices,
       date: dates,
     };
-  }
+}
   
+function plotCandles(klines){
+    // Define the data for the candlestick chart
+var trace1 = {
+    type: 'candlestick',
+    x: klines.date,
+    open: klines.open,
+    high: klines.high,
+    low: klines.low,
+    close: klines.close,
+    increasing: {line: {color: '#00CC94'}},
+    decreasing: {line: {color: '#F50000'}}
+};
+
+// Define the data for the upper Bollinger Band
+var trace2 = {
+    type: 'scatter',
+    x: klines.date,
+    y: klines.upper,
+    mode: 'lines',
+    line: {color: '#FFA07A'}
+};
+
+// Define the data for the lower Bollinger Band
+var trace3 = {
+    type: 'scatter',
+    x: klines.date,
+    y: klines.lower,
+    mode: 'lines',
+    line: {color: '#FFA07A'}
+};
+
+// Combine the data for the candlestick chart and Bollinger Bands
+var data = [trace1, trace2, trace3];
+
+// Define the layout for the chart
+var layout = {
+    title: 'Candlestick Chart with Bollinger Bands',
+    xaxis: {
+        rangeslider: {
+            visible: false
+        }
+    },
+    yaxis: {
+        title: 'Price'
+    }
+};
+
+// Plot the chart
+Plotly.newPlot('chart_div', data, layout);
+}
