@@ -259,5 +259,5 @@ var layout = {
 };
 
 // Plot the chart
-Plotly.newPlot('chart_div', rsi, layout);
+Plotly.newPlot('rsi', rsi, layout);
 }
