@@ -45,6 +45,16 @@ async function doCalculate() {
         window.myChart.destroy();
     }
 
+
+    klines.upper = upperBands;
+    klines.lower = lowerBands;
+    klines.movingAverages = movingAverages;
+    plotBBands(klines);
+    plotCandles(klines);
+    plotRrs(klines);
+}
+
+function plotBBands(klines) {
     const labels = klines.date;
     const closePrices = klines.close;
 
@@ -59,21 +69,21 @@ async function doCalculate() {
             },
             {
                 label: "Moving Average",
-                data: movingAverages,
+                data: klines.movingAverages,
                 borderColor: "rgb(255, 99, 132)",
                 fill: false,
                 tension: 0.1,
             },
             {
                 label: "Upper Band",
-                data: upperBands,
+                data: klines.upper,
                 borderColor: "rgb(75, 192, 192)",
                 fill: false,
                 tension: 0.1,
             },
             {
                 label: "Lower Band",
-                data: lowerBands,
+                data: klines.lower,
                 borderColor: "rgb(153, 102, 255)",
                 fill: false,
                 tension: 0.1,
@@ -106,10 +116,6 @@ async function doCalculate() {
     };
 
     window.myChart = new Chart(chartElement, config);
-    klines.upper = upperBands;
-    klines.lower = lowerBands;
-    plotCandles(klines);
-    plotRSI(klines);
 }
 
 function transformKlinesResponse(response) {
@@ -118,74 +124,74 @@ function transformKlinesResponse(response) {
     const highPrices = [];
     const lowPrices = [];
     const dates = [];
-  
+
     for (let i = 0; i < response.length; i++) {
-      const kline = response[i];
-      openPrices.push(parseFloat(kline[1]));
-      highPrices.push(parseFloat(kline[2]));
-      lowPrices.push(parseFloat(kline[3]));
-      closePrices.push(parseFloat(kline[4]));
-      dates.push(new Date(kline[0]));
+        const kline = response[i];
+        openPrices.push(parseFloat(kline[1]));
+        highPrices.push(parseFloat(kline[2]));
+        lowPrices.push(parseFloat(kline[3]));
+        closePrices.push(parseFloat(kline[4]));
+        dates.push(new Date(kline[0]));
     }
-  
+
     return {
-      open: openPrices,
-      close: closePrices,
-      high: highPrices,
-      low: lowPrices,
-      date: dates,
+        open: openPrices,
+        close: closePrices,
+        high: highPrices,
+        low: lowPrices,
+        date: dates,
     };
 }
-  
-function plotCandles(klines){
+
+function plotCandles(klines) {
     // Define the data for the candlestick chart
-var trace1 = {
-    type: 'candlestick',
-    x: klines.date,
-    open: klines.open,
-    high: klines.high,
-    low: klines.low,
-    close: klines.close,
-    increasing: {line: {color: '#00CC94'}},
-    decreasing: {line: {color: '#F50000'}}
-};
+    var trace1 = {
+        type: 'candlestick',
+        x: klines.date,
+        open: klines.open,
+        high: klines.high,
+        low: klines.low,
+        close: klines.close,
+        increasing: { line: { color: '#00CC94' } },
+        decreasing: { line: { color: '#F50000' } }
+    };
 
-// Define the data for the upper Bollinger Band
-var trace2 = {
-    type: 'scatter',
-    x: klines.date,
-    y: klines.upper,
-    mode: 'lines',
-    line: {color: '#FFA07A'}
-};
+    // Define the data for the upper Bollinger Band
+    var trace2 = {
+        type: 'scatter',
+        x: klines.date,
+        y: klines.upper,
+        mode: 'lines',
+        line: { color: '#FFA07A' }
+    };
 
-// Define the data for the lower Bollinger Band
-var trace3 = {
-    type: 'scatter',
-    x: klines.date,
-    y: klines.lower,
-    mode: 'lines',
-    line: {color: '#FFA07A'}
-};
+    // Define the data for the lower Bollinger Band
+    var trace3 = {
+        type: 'scatter',
+        x: klines.date,
+        y: klines.lower,
+        mode: 'lines',
+        line: { color: '#FFA07A' }
+    };
 
-// Combine the data for the candlestick chart and Bollinger Bands
-var data = [trace1, trace2, trace3];
+    // Combine the data for the candlestick chart and Bollinger Bands
+    var data = [trace1, trace2, trace3];
 
-// Define the layout for the chart
-var layout = {
-    title: 'Candlestick Chart with Bollinger Bands',
-    xaxis: {
-        rangeslider: {
-            visible: false
+    // Define the layout for the chart
+    var layout = {
+        title: 'Candlestick Chart with Bollinger Bands',
+        xaxis: {
+            rangeslider: {
+                visible: false
+            }
+        },
+        yaxis: {
+            title: 'Price'
         }
-    },
-    yaxis: {
-        title: 'Price'
-    }
-};
+    };
 
-// Plot the chart
-Plotly.newPlot('chart_div', data, layout);
+    // Plot the chart
+    Plotly.newPlot('chart_div', data, layout);
 }
 
 function calculateRSI(prices, period = 14) {
@@ -231,33 +237,33 @@ function sum(values) {
     return values.reduce((total, value) => total + value, 0);
 }
 
-function plotRsi(klines){
+function plotRsi(klines) {
     // Define the data for the candlestick chart
 
-// Define the data for the lower Bollinger Band
-var rsi = {
-    type: 'scatter',
-    x: klines.date,
-    y: calculateRSI(klines.close),
-    mode: 'lines',
-    line: {color: '#FFA07A'}
-};
+    // Define the data for the lower Bollinger Band
+    var rsi = {
+        type: 'scatter',
+        x: klines.date,
+        y: calculateRSI(klines.close),
+        mode: 'lines',
+        line: { color: '#FFA07A' }
+    };
 
-// Combine the data for the candlestick chart and Bollinger Bands
+    // Combine the data for the candlestick chart and Bollinger Bands
 
-// Define the layout for the chart
-var layout = {
-    title: 'Candlestick Chart with Bollinger Bands',
-    xaxis: {
-        rangeslider: {
-            visible: false
+    // Define the layout for the chart
+    var layout = {
+        title: 'Candlestick Chart with Bollinger Bands',
+        xaxis: {
+            rangeslider: {
+                visible: false
+            }
+        },
+        yaxis: {
+            title: 'Price'
         }
-    },
-    yaxis: {
-        title: 'Price'
-    }
-};
+    };
 
-// Plot the chart
-Plotly.newPlot('rsi', rsi, layout);
+    // Plot the chart
+    Plotly.newPlot('rsi', rsi, layout);
 }
