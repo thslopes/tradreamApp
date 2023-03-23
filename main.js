@@ -45,7 +45,7 @@ async function doCalculate() {
     klines.movingAverages = movingAverages;
     plotBBands(klines);
     plotCandles(klines);
-    // plotRSI(klines);
+    plotRSI(klines);
 }
 
 function plotBBands(klines) {
@@ -192,45 +192,30 @@ function plotCandles(klines) {
     Plotly.newPlot('chart_div', data, layout);
 }
 
-function calculateRSI(prices, period = 14) {
-    if (prices.length < period) {
-        throw new Error(`Not enough prices provided for period ${period}`);
-    }
+function calculateRSI(values, period = 14) {
+  const rsiArray = [];
+  const deltas = [];
+  
+  for (let i = 1; i < values.length; i++) {
+    deltas.push(values[i] - values[i - 1]);
+  }
+  for (let i = 0; i <period; i++) {
+    rsiArray.push(0);
+  }
+  for (let i = period; i <= values.length; i++) {
+    const gains = deltas.slice(i - period, i).filter((delta) => delta > 0);
+    const losses = deltas.slice(i - period, i).filter((delta) => delta < 0);
 
-    const gains = [0];
-    const losses = [0];
+    const avgGain = gains.reduce((sum, gain) => sum + gain, 0) / period;
+    const avgLoss = Math.abs(losses.reduce((sum, loss) => sum + loss, 0) / period);
 
-    for (let i = 1; i < prices.length; i++) {
-        const diff = prices[i] - prices[i - 1];
-        if (diff > 0) {
-            gains.push(diff);
-            losses.push(0);
-        } else {
-            gains.push(0);
-            losses.push(-diff);
-        }
-    }
+    const RS = avgGain / avgLoss;
+    const RSI = 100 - (100 / (1 + RS));
 
-    let avgGain = sum(gains.slice(1, period + 1)) / period;
-    let avgLoss = sum(losses.slice(1, period + 1)) / period;
+    rsiArray.push(RSI);
+  }
 
-    const rs = avgGain / avgLoss;
-    const rsi = 100 - 100 / (1 + rs);
-    const rr = []
-
-    for (let i = period + 1; i < prices.length; i++) {
-        const gain = gains[i];
-        const loss = losses[i];
-
-        avgGain = (avgGain * (period - 1) + gain) / period;
-        avgLoss = (avgLoss * (period - 1) + loss) / period;
-
-        const rs = avgGain / avgLoss;
-        const rsi = 100 - 100 / (1 + rs);
-        rr.push(rsi);
-    }
-
-    return rr;
+  return rsiArray;
 }
 
 
@@ -239,7 +224,6 @@ function sum(values) {
 }
 
 function plotRSI(klines) {
-    // Define the data for the candlestick chart
 
     // Define the data for the lower Bollinger Band
     var rsi = {
@@ -250,11 +234,9 @@ function plotRSI(klines) {
         line: { color: '#FFA07A' }
     };
 
-    // Combine the data for the candlestick chart and Bollinger Bands
-
     // Define the layout for the chart
     var layout = {
-        title: 'Candlestick Chart with Bollinger Bands',
+        title: 'Candlestick Chart with RSI',
         xaxis: {
             rangeslider: {
                 visible: false
@@ -266,5 +248,5 @@ function plotRSI(klines) {
     };
 
     // Plot the chart
-    Plotly.newPlot('rsi', rsi, layout);
+    Plotly.newPlot('rsi', [rsi], layout);
 }
