@@ -109,6 +109,7 @@ async function doCalculate() {
     klines.upper = upperBands;
     klines.lower = lowerBands;
     plotCandles(klines);
+    plotRSI(klines);
 }
 
 function transformKlinesResponse(response) {
@@ -185,4 +186,78 @@ var layout = {
 
 // Plot the chart
 Plotly.newPlot('chart_div', data, layout);
+}
+
+function calculateRSI(prices, period = 14) {
+    if (prices.length < period) {
+        throw new Error(`Not enough prices provided for period ${period}`);
+    }
+
+    const gains = [0];
+    const losses = [0];
+
+    for (let i = 1; i < prices.length; i++) {
+        const diff = prices[i] - prices[i - 1];
+        if (diff > 0) {
+            gains.push(diff);
+            losses.push(0);
+        } else {
+            gains.push(0);
+            losses.push(-diff);
+        }
+    }
+
+    const avgGain = sum(gains.slice(1, period + 1)) / period;
+    const avgLoss = sum(losses.slice(1, period + 1)) / period;
+
+    const rs = avgGain / avgLoss;
+    const rsi = 100 - 100 / (1 + rs);
+
+    for (let i = period + 1; i < prices.length; i++) {
+        const gain = gains[i];
+        const loss = losses[i];
+
+        avgGain = (avgGain * (period - 1) + gain) / period;
+        avgLoss = (avgLoss * (period - 1) + loss) / period;
+
+        const rs = avgGain / avgLoss;
+        const rsi = 100 - 100 / (1 + rs);
+    }
+
+    return rsi;
+}
+
+function sum(values) {
+    return values.reduce((total, value) => total + value, 0);
+}
+
+function plotRsi(klines){
+    // Define the data for the candlestick chart
+
+// Define the data for the lower Bollinger Band
+var rsi = {
+    type: 'scatter',
+    x: klines.date,
+    y: calculateRSI(klines.close),
+    mode: 'lines',
+    line: {color: '#FFA07A'}
+};
+
+// Combine the data for the candlestick chart and Bollinger Bands
+
+// Define the layout for the chart
+var layout = {
+    title: 'Candlestick Chart with Bollinger Bands',
+    xaxis: {
+        rangeslider: {
+            visible: false
+        }
+    },
+    yaxis: {
+        title: 'Price'
+    }
+};
+
+// Plot the chart
+Plotly.newPlot('chart_div', rsi, layout);
 }
