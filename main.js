@@ -143,7 +143,7 @@ function transformKlinesResponse(response) {
 
 function plotCandles(klines) {
     // Define the data for the candlestick chart
-    var trace1 = {
+    var prices = {
         type: 'candlestick',
         x: klines.date,
         open: klines.open,
@@ -155,7 +155,7 @@ function plotCandles(klines) {
     };
 
     // Define the data for the upper Bollinger Band
-    var trace2 = {
+    var upper = {
         type: 'scatter',
         x: klines.date,
         y: klines.upper,
@@ -164,7 +164,7 @@ function plotCandles(klines) {
     };
 
     // Define the data for the lower Bollinger Band
-    var trace3 = {
+    var lower = {
         type: 'scatter',
         x: klines.date,
         y: klines.lower,
@@ -173,11 +173,12 @@ function plotCandles(klines) {
     };
 
     // Combine the data for the candlestick chart and Bollinger Bands
-    var data = [trace1, trace2, trace3];
+    var data = [prices, upper, lower];
 
     // Define the layout for the chart
     var layout = {
-        title: 'Candlestick Chart with Bollinger Bands',
+        title: 'Candlestick with Bollinger Bands',
+        showlegend: false,
         xaxis: {
             rangeslider: {
                 visible: false
@@ -200,7 +201,7 @@ function calculateRSI(values, period = 14) {
     deltas.push(values[i] - values[i - 1]);
   }
   for (let i = 0; i <period; i++) {
-    rsiArray.push(0);
+    rsiArray.push(null);
   }
   for (let i = period; i <= values.length; i++) {
     const gains = deltas.slice(i - period, i).filter((delta) => delta > 0);
@@ -236,14 +237,15 @@ function plotRSI(klines) {
 
     // Define the layout for the chart
     var layout = {
-        title: 'Candlestick Chart with RSI',
+        title: 'RSI',
         xaxis: {
             rangeslider: {
                 visible: false
             }
         },
         yaxis: {
-            title: 'Price'
+            title: 'RSI',
+            range: [0, 100],
         }
     };
 
