@@ -40,18 +40,12 @@ async function doCalculate() {
     klines = transformKlinesResponse(klines);
     const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines.close);
 
-    const chartElement = document.getElementById("chart");
-    if (window.myChart) {
-        window.myChart.destroy();
-    }
-
-
     klines.upper = upperBands;
     klines.lower = lowerBands;
     klines.movingAverages = movingAverages;
     plotBBands(klines);
     plotCandles(klines);
-    plotRrs(klines);
+    // plotRSI(klines);
 }
 
 function plotBBands(klines) {
@@ -115,6 +109,10 @@ function plotBBands(klines) {
         },
     };
 
+    const chartElement = document.getElementById("chart");
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
     window.myChart = new Chart(chartElement, config);
 }
 
@@ -213,11 +211,12 @@ function calculateRSI(prices, period = 14) {
         }
     }
 
-    const avgGain = sum(gains.slice(1, period + 1)) / period;
-    const avgLoss = sum(losses.slice(1, period + 1)) / period;
+    let avgGain = sum(gains.slice(1, period + 1)) / period;
+    let avgLoss = sum(losses.slice(1, period + 1)) / period;
 
     const rs = avgGain / avgLoss;
     const rsi = 100 - 100 / (1 + rs);
+    const rr = []
 
     for (let i = period + 1; i < prices.length; i++) {
         const gain = gains[i];
@@ -228,16 +227,18 @@ function calculateRSI(prices, period = 14) {
 
         const rs = avgGain / avgLoss;
         const rsi = 100 - 100 / (1 + rs);
+        rr.push(rsi);
     }
 
-    return rsi;
+    return rr;
 }
+
 
 function sum(values) {
     return values.reduce((total, value) => total + value, 0);
 }
 
-function plotRsi(klines) {
+function plotRSI(klines) {
     // Define the data for the candlestick chart
 
     // Define the data for the lower Bollinger Band
