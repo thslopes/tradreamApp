@@ -194,29 +194,24 @@ function plotCandles(klines) {
 }
 
 function calculateRSI(values, period = 14) {
-  const rsiArray = [];
-  const deltas = [];
-  
-  for (let i = 1; i < values.length; i++) {
-    deltas.push(values[i] - values[i - 1]);
-  }
-  for (let i = 0; i <period; i++) {
-    rsiArray.push(null);
-  }
-  for (let i = period; i <= values.length; i++) {
-    const gains = deltas.slice(i - period, i).filter((delta) => delta > 0);
-    const losses = deltas.slice(i - period, i).filter((delta) => delta < 0);
+    const rsiArray = [];
+    const deltas = [];
+    for (let i = 1; i < values.length; i++) {
+        deltas.push(values[i] - values[i - 1]);
+        if (i >= period) {
+            const gains = deltas.slice(i - period, i).map((delta) => delta > 0 ? delta : 0);
+            const losses = deltas.slice(i - period, i).map((delta) => delta < 0 ? delta : 0);
+            const avgGain = gains.reduce((sum, gain) => sum + gain, 0) / period;
+            const avgLoss = Math.abs(losses.reduce((sum, loss) => sum + loss, 0) / period);
+            const RS = avgGain / avgLoss;
+            const RSI = 100 - (100 / (1 + RS));
+            rsiArray.push(RSI);
+        } else {
+            rsiArray.push(null);
+        }
+    }
+    return rsiArray;
 
-    const avgGain = gains.reduce((sum, gain) => sum + gain, 0) / period;
-    const avgLoss = Math.abs(losses.reduce((sum, loss) => sum + loss, 0) / period);
-
-    const RS = avgGain / avgLoss;
-    const RSI = 100 - (100 / (1 + RS));
-
-    rsiArray.push(RSI);
-  }
-
-  return rsiArray;
 }
 
 
