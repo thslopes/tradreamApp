@@ -247,3 +247,7 @@ function plotRSI(klines) {
     // Plot the chart
     Plotly.newPlot('rsi', [rsi], layout);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    doCalculate();
+  });
