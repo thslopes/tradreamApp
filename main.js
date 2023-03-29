@@ -46,6 +46,7 @@ async function doCalculate() {
     plotBBands(klines);
     plotCandles(klines);
     plotRSI(klines);
+    calculateAndPlotMACD(klines.close, klines.date);
 }
 
 function plotBBands(klines) {
