@@ -47,6 +47,7 @@ async function doCalculate() {
     plotCandles(klines);
     plotRSI(klines);
     calculateAndPlotMACD(klines.close, klines.date);
+    plotStochasticRSI(klines.,14,14,3);
 }
 
 function plotBBands(klines) {
