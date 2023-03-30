@@ -28,72 +28,70 @@ function calculateBollingerBands(closePrices, period = 20, deviation = 2) {
     return { movingAverages, upperBands, lowerBands };
 }
 
-
-
 function plotBBands(klines) {
     const labels = klines.date;
     const closePrices = klines.close;
 
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: "Close Price",
-                data: closePrices,
-                borderColor: "rgb(54, 162, 235)",
-                tension: 0.1,
-            },
-            {
-                label: "Moving Average",
-                data: klines.movingAverages,
-                borderColor: "rgb(255, 99, 132)",
-                fill: false,
-                tension: 0.1,
-            },
-            {
-                label: "Upper Band",
-                data: klines.upper,
-                borderColor: "rgb(75, 192, 192)",
-                fill: false,
-                tension: 0.1,
-            },
-            {
-                label: "Lower Band",
-                data: klines.lower,
-                borderColor: "rgb(153, 102, 255)",
-                fill: false,
-                tension: 0.1,
-            },
-        ],
+    const traceClosePrice = {
+        x: labels,
+        y: closePrices,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Close Price',
+        line: {
+            color: 'rgb(54, 162, 235)',
+            width: 1
+        }
     };
 
-    const config = {
-        type: 'line',
-        data: data,
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 5
-                    },
-                    time: {
-                        // Luxon format string
-                        tooltipFormat: 'HH mm'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                }
-            },
+    const traceMovingAverage = {
+        x: labels,
+        y: klines.movingAverages,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Moving Average',
+        line: {
+            color: 'rgb(255, 99, 132)',
+            width: 1
+        }
+    };
+
+    const traceUpperBand = {
+        x: labels,
+        y: klines.upper,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Upper Band',
+        line: {
+            color: 'rgb(75, 192, 192)',
+            width: 1
+        }
+    };
+
+    const traceLowerBand = {
+        x: labels,
+        y: klines.lower,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Lower Band',
+        line: {
+            color: 'rgb(153, 102, 255)',
+            width: 1
+        }
+    };
+
+    const layout = {
+        title: 'Bollinger Bands',
+        xaxis: {
+            title: 'Date',
+            tickformat: '%H %M'
         },
+        yaxis: {
+            title: 'Price'
+        }
     };
 
-    const chartElement = document.getElementById("chart");
-    if (window.myChart) {
-        window.myChart.destroy();
-    }
-    window.myChart = new Chart(chartElement, config);
+    const data = [traceClosePrice, traceMovingAverage, traceUpperBand, traceLowerBand];
+
+    Plotly.newPlot('bbands', data, layout);
 }
