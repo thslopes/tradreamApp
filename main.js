@@ -18,7 +18,6 @@ async function doCalculate() {
     plotCandles(klines);
     plotRSI(klines);
     calculateAndPlotMACD(klines.close, klines.date);
-    plotStochasticRSI(klines.close, 14, 14, 3);
 }
 
 function transformKlinesResponse(response) {
