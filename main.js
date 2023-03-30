@@ -4,35 +4,6 @@ async function getKlines(symbol, interval) {
     const data = await response.json();
     return data;
 }
-function calculateBollingerBands(closePrices, period = 20, deviation = 2) {
-    const movingAverages = [];
-    const upperBands = [];
-    const lowerBands = [];
-
-    for (let i = 0; i < closePrices.length; i++) {
-        if (i < period - 1) {
-            movingAverages.push(null);
-            upperBands.push(null);
-            lowerBands.push(null);
-            continue;
-        }
-
-        const slice = closePrices.slice(i - period + 1, i + 1);
-        const sum = slice.reduce((acc, val) => acc + val, 0);
-        const movingAverage = sum / period;
-        const standardDeviation =
-            Math.sqrt(
-                slice.reduce((acc, val) => acc + (val - movingAverage) ** 2, 0) /
-                period
-            ) || 0;
-
-        movingAverages.push(movingAverage);
-        upperBands.push(movingAverage + deviation * standardDeviation);
-        lowerBands.push(movingAverage - deviation * standardDeviation);
-    }
-
-    return { movingAverages, upperBands, lowerBands };
-}
 
 async function doCalculate() {
     const symbol = document.getElementById("symbol").value;
@@ -47,75 +18,7 @@ async function doCalculate() {
     plotCandles(klines);
     plotRSI(klines);
     calculateAndPlotMACD(klines.close, klines.date);
-    plotStochasticRSI(klines.close,14,14,3);
-}
-
-function plotBBands(klines) {
-    const labels = klines.date;
-    const closePrices = klines.close;
-
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: "Close Price",
-                data: closePrices,
-                borderColor: "rgb(54, 162, 235)",
-                tension: 0.1,
-            },
-            {
-                label: "Moving Average",
-                data: klines.movingAverages,
-                borderColor: "rgb(255, 99, 132)",
-                fill: false,
-                tension: 0.1,
-            },
-            {
-                label: "Upper Band",
-                data: klines.upper,
-                borderColor: "rgb(75, 192, 192)",
-                fill: false,
-                tension: 0.1,
-            },
-            {
-                label: "Lower Band",
-                data: klines.lower,
-                borderColor: "rgb(153, 102, 255)",
-                fill: false,
-                tension: 0.1,
-            },
-        ],
-    };
-
-    const config = {
-        type: 'line',
-        data: data,
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 5
-                    },
-                    time: {
-                        // Luxon format string
-                        tooltipFormat: 'HH mm'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                }
-            },
-        },
-    };
-
-    const chartElement = document.getElementById("chart");
-    if (window.myChart) {
-        window.myChart.destroy();
-    }
-    window.myChart = new Chart(chartElement, config);
+    plotStochasticRSI(klines.close, 14, 14, 3);
 }
 
 function transformKlinesResponse(response) {
@@ -156,30 +59,9 @@ function plotCandles(klines) {
         decreasing: { line: { color: '#F50000' } }
     };
 
-    // Define the data for the upper Bollinger Band
-    var upper = {
-        type: 'scatter',
-        x: klines.date,
-        y: klines.upper,
-        mode: 'lines',
-        line: { color: '#FFA07A' }
-    };
-
-    // Define the data for the lower Bollinger Band
-    var lower = {
-        type: 'scatter',
-        x: klines.date,
-        y: klines.lower,
-        mode: 'lines',
-        line: { color: '#FFA07A' }
-    };
-
-    // Combine the data for the candlestick chart and Bollinger Bands
-    var data = [prices, upper, lower];
-
     // Define the layout for the chart
     var layout = {
-        title: 'Candlestick with Bollinger Bands',
+        title: document.getElementById("symbol").value,
         showlegend: false,
         xaxis: {
             rangeslider: {
@@ -192,7 +74,7 @@ function plotCandles(klines) {
     };
 
     // Plot the chart
-    Plotly.newPlot('chart_div', data, layout);
+    Plotly.newPlot('candles', [prices], layout);
 }
 
 function calculateRSI(values, period = 14) {
@@ -215,7 +97,6 @@ function calculateRSI(values, period = 14) {
     return rsiArray;
 
 }
-
 
 function sum(values) {
     return values.reduce((total, value) => total + value, 0);
@@ -252,4 +133,4 @@ function plotRSI(klines) {
 
 document.addEventListener("DOMContentLoaded", () => {
     doCalculate();
-  });
+});
