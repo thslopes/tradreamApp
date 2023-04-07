@@ -88,7 +88,8 @@ function plotBBands(klines) {
         },
         yaxis: {
             title: 'Price'
-        }
+        },
+        legend: { x: 0, y: 1 }
     };
 
     const data = [traceClosePrice, traceMovingAverage, traceUpperBand, traceLowerBand];
