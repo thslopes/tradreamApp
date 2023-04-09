@@ -7,7 +7,7 @@ async function getKlines(symbol, interval) {
 
 async function doCalculate() {
     const symbol = document.getElementById("symbol").value;
-    let klines = await getKlines(symbol, "15m");
+    let klines = await getKlines(symbol, "1h");
     klines = transformKlinesResponse(klines);
     const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines.close);
 
