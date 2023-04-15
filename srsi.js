@@ -1,80 +1,60 @@
-function calculateStochasticRSI(closePrices, rsiPeriod, stochasticPeriod, kPeriod) {
-    const rsi = calculateRSI(closePrices, rsiPeriod);
-    const rsis = calculateRSIS(closePrices, rsiPeriod, stochasticPeriod);
-    const kValues = calculateStochastic(rsis, stochasticPeriod, kPeriod);
-    const dValues = calculateEMA(kValues, 3);
-  
-    return { kValues, dValues };
-  }
-  
-  function calculateRSI(closePrices, period) {
-    const changes = closePrices.map((price, i) => {
-      if (i === 0) {
-        return 0;
-      } else {
-        return price - closePrices[i - 1];
-      }
-    });
-  
-    const upChanges = changes.map((change) => Math.max(change, 0));
-    const downChanges = changes.map((change) => Math.abs(Math.min(change, 0)));
-  
-    const avgUp = calculateEMA(upChanges, period);
-    const avgDown = calculateEMA(downChanges, period);
-  
-    const rs = avgUp.map((avg, i) => avg / avgDown[i]);
-    const rsi = rs.map((r) => 100 - 100 / (1 + r));
-  
-    return rsi;
-  }
-  
-  function calculateRSIS(closePrices, rsiPeriod, stochasticPeriod) {
-    const rsiSlice = closePrices.slice(rsiPeriod - 1);
-    const rsiValues = calculateRSI(rsiSlice, rsiPeriod);
-  
-    const maxRSI = Math.max(...rsiValues.slice(0, stochasticPeriod));
-    const minRSI = Math.min(...rsiValues.slice(0, stochasticPeriod));
-  
-    const rsis = rsiValues.map((rsi, i) => {
-      if (i < stochasticPeriod - 1) {
-        return null;
-      } else {
-        const slice = rsiValues.slice(i - stochasticPeriod + 1, i + 1);
-        const max = Math.max(...slice);
-        const min = Math.min(...slice);
-        return (rsi - min) / (max - min);
-      }
-    });
-  
-    return rsis;
-  }
-  
-  function calculateStochastic(rsis, stochasticPeriod, kPeriod) {
-    const kValues = rsis.map((rsi, i) => {
-      if (i < stochasticPeriod + kPeriod - 2) {
-        return null;
-      } else {
-        const slice = rsis.slice(i - kPeriod + 1, i + 1);
-        const sum = slice.reduce((acc, val) => acc + val, 0);
-        return sum / kPeriod;
-      }
-    });
-  
-    return kValues;
-  }
-  
-  function calculateEMA(data, period) {
-    const k = 2 / (period + 1);
-    const ema = [data[0]];
-    for (let i = 1; i < data.length; i++) {
-      ema.push(data[i] * k + ema[i - 1] * (1 - k));
+function calculateRSI(closePrices, period) {
+  const changes = closePrices.map((price, i) => {
+    if (i === 0) {
+      return 0;
+    } else {
+      return price - closePrices[i - 1];
     }
-    return ema;
-  }
+  });
 
+  const upChanges = changes.map((change) => Math.max(change, 0));
+  const downChanges = changes.map((change) => Math.abs(Math.min(change, 0)));
+
+  const avgUp = calculateEMA(upChanges, period);
+  const avgDown = calculateEMA(downChanges, period);
+
+  const rs = avgUp.map((avg, i) => avg / avgDown[i]);
+  const rsi = rs.map((r) => 100 - 100 / (1 + r));
+
+  return rsi;
+}
+
+function calculateRSIS(closePrices, rsiPeriod, stochasticPeriod) {
+  const rsiSlice = closePrices.slice(rsiPeriod - 1);
+  const rsiValues = calculateRSI(rsiSlice, rsiPeriod);
+
+  const maxRSI = Math.max(...rsiValues.slice(0, stochasticPeriod));
+  const minRSI = Math.min(...rsiValues.slice(0, stochasticPeriod));
+
+  const rsis = rsiValues.map((rsi, i) => {
+    if (i < stochasticPeriod - 1) {
+      return null;
+    } else {
+      const slice = rsiValues.slice(i - stochasticPeriod + 1, i + 1);
+      const max = Math.max(...slice);
+      const min = Math.min(...slice);
+      return (rsi - min) / (max - min);
+    }
+  });
+
+  return rsis;
+}
+
+function calculateStochastic(rsis, stochasticPeriod, kPeriod) {
+  const kValues = rsis.map((rsi, i) => {
+    if (i < stochasticPeriod + kPeriod - 2) {
+      return null;
+    } else {
+      const slice = rsis.slice(i - kPeriod + 1, i + 1);
+      const sum = slice.reduce((acc, val) => acc + val, 0);
+      return sum / kPeriod;
+    }
+  });
+
+  return kValues;
+}
 
 function plotStochasticRSI(closePrices, rsiPeriod, stochasticPeriod, kPeriod) {
-  const rsi = calculateRSI(closePrices, rsiPeriod);
   const rsis = calculateRSIS(closePrices, rsiPeriod, stochasticPeriod);
   const kValues = calculateStochastic(rsis, stochasticPeriod, kPeriod);
   const dValues = calculateEMA(kValues, 3);

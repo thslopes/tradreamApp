@@ -1,20 +1,22 @@
 form {
-    width: 100%;
-    margin: 0 auto;
-  }
+  width: 100%;
+  margin: 0 auto;
+}
 
-  input[type="text"],
-  button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    font-size: 36px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
+input[type="text"],
+button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 36px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
 
-  canvas, #chart_div, #rsi {
-    width: 100%;
-    height: auto;
-  }
+canvas,
+#chart_div,
+#rsi {
+  width: 100%;
+  height: auto;
+}

@@ -18,7 +18,7 @@ async function doCalculate() {
     plotCandles(klines);
     plotRSI(klines);
     calculateAndPlotMACD(klines.close, klines.date);
-    plotMACDATR(klines, 26)
+    plotMACDV(klines, 26)
 }
 
 function transformKlinesResponse(response) {
@@ -134,3 +134,36 @@ function plotRSI(klines) {
 document.addEventListener("DOMContentLoaded", () => {
     doCalculate();
 });
+
+function calculateEMA(data, period) {
+    const k = 2 / (period + 1);
+    const ema = [data[0]];
+    for (let i = 1; i < data.length; i++) {
+        ema.push(data[i] * k + ema[i - 1] * (1 - k));
+    }
+    return ema;
+}
+
+function calculateSmoothedMovingAverage(data, period) {
+    let sum = 0;
+    let multiplier = 1;
+    let sma = Array(data.length).fill(0);
+
+    // Calculate the sum of the prices
+    for (let i = 0; i < period; i++) {
+        sum += data[i];
+    }
+
+    // Calculate the SMA for the first period
+    sma[period - 1] = sum / period;
+
+    // Calculate the SMA for the remaining periods
+    for (let i = period; i < data.length; i++) {
+        sum += data[i] - data[i - period];
+        multiplier = 2 / (period + 1);
+        sma[i] = (data[i] - sma[i - 1]) * multiplier + sma[i - 1];
+    }
+
+    return sma;
+}
+
