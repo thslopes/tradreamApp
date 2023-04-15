@@ -18,6 +18,7 @@ async function doCalculate() {
     plotCandles(klines);
     plotRSI(klines);
     calculateAndPlotMACD(klines.close, klines.date);
+    plotMACDATR(klines, 26)
 }
 
 function transformKlinesResponse(response) {
