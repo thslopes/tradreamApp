@@ -71,11 +71,5 @@ function calculateATR(data, period) {
     tr[i] = Math.max(h2l, h2c1, l2c1);
   }
 
-  let sma = calculateSmoothedMovingAverage(tr, period);
-
-  for (let i = period - 1; i < data.low.length; i++) {
-    atr[i] = sma[i] * period;
-  }
-
-  return atr;
+  return calculateSmoothedMovingAverage(tr, period);
 }
