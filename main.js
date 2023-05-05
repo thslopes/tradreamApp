@@ -5,10 +5,37 @@ async function getKlines(symbol, interval) {
     return data;
 }
 
+async function getHistoricalPricesSA(symbol, startDate, endDate) {
+    const url = `https://query1.finance.yahoo.com/v7/finance/download/${symbol}.SA?period1=${startDate}&period2=${endDate}&interval=1d&events=history`;
+    const response = await fetch(url);
+    const data = await response.text();
+    const prices = data.split('\n').slice(1).map((row) => {
+      const [date, open, high, low, close, adjClose, volume] = row.split(',');
+      return { date, open: +open, high: +high, low: +low, close: +close, adjClose: +adjClose, volume: +volume };
+    });
+    return prices;
+  }
+  
+
+async function doCalculateFII() {
+    const symbol = document.getElementById("symbol").value;
+    const endDate = Math.floor(Date.now() / 1000); // current Unix timestamp
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const startDate = Math.floor(sixMonthsAgo.getTime() / 1000); // Unix timestamp 6 months ago
+    
+    klines = await getHistoricalPricesSA(symbol, startDate, endDate)
+    calculateAndPlotAll(klines);
+}
+
 async function doCalculate() {
     const symbol = document.getElementById("symbol").value;
     let klines = await getKlines(symbol, "1h");
     klines = transformKlinesResponse(klines);
+    calculateAndPlotAll(klines);
+}
+
+function calculateAndPlotAll(klines) {
     const { movingAverages, upperBands, lowerBands } = calculateBollingerBands(klines.close);
 
     klines.upper = upperBands;
@@ -18,7 +45,7 @@ async function doCalculate() {
     plotCandles(klines);
     plotRSI(klines);
     calculateAndPlotMACD(klines.close, klines.date);
-    plotMACDV(klines, 26)
+    plotMACDV(klines, 26);
 }
 
 function transformKlinesResponse(response) {
@@ -132,7 +159,12 @@ function plotRSI(klines) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    doCalculate();
+    if (fii == true) {
+        doCalculateFII();
+
+    } else {
+        doCalculate();
+    }
 });
 
 function calculateEMA(data, period) {

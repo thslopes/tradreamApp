@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
   <script>
-    const fii = false;
+    const fii = true;
   </script>
   <link rel="stylesheet" href="./main.css">
 </head>
@@ -17,10 +17,11 @@
   <form>
     <label for="symbol">Symbol:</label>
     <select id="symbol">
-      <option value="BTCBUSD">BTCBUSD</option>
-      <option value="ETHBUSD">ETHBUSD</option>
+      <option value="XPCI11">XPCI11</option>
+      <option value="CPTS11">CPTS11</option>
+      <option value="KNCR11">KNCR11</option>
     </select><br /><br />
-    <button type="button" onclick="doCalculate()">Calculate</button>
+    <button type="button" onclick="doCalculateFII()">Calculate FII</button>
   </form>
 
   <h2>Results</h2>
