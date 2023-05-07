@@ -5,26 +5,40 @@ async function getKlines(symbol, interval) {
     return data;
 }
 
-async function getHistoricalPricesSA(symbol, startDate, endDate) {
-    const url = `https://query1.finance.yahoo.com/v7/finance/download/${symbol}.SA?period1=${startDate}&period2=${endDate}&interval=1d&events=history`;
-    const response = await fetch(url);
-    const data = await response.text();
-    const prices = data.split('\n').slice(1).map((row) => {
-      const [date, open, high, low, close, adjClose, volume] = row.split(',');
-      return { date, open: +open, high: +high, low: +low, close: +close, adjClose: +adjClose, volume: +volume };
-    });
-    return prices;
+async function getHistoricalPricesSA(symbol, apiKey) {
+  const apiUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}.SA&apikey=${apiKey}`;
+
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (data['Error Message']) {
+      throw new Error(data['Error Message']);
+    }
+
+    debugger;
+    const seriesKey = "Time Series (Daily)";
+    const marketData = Object.entries(data[seriesKey]).map(([date, values]) => ({
+      date,
+      open: Number(values['1. open']),
+      high: Number(values['2. high']),
+      low: Number(values['3. low']),
+      close: Number(values['4. close']),
+      volume: Number(values['5. volume']),
+    }));
+
+    return marketData;
+  } catch (error) {
+    console.error(error);
   }
-  
+}
+
 
 async function doCalculateFII() {
     const symbol = document.getElementById("symbol").value;
-    const endDate = Math.floor(Date.now() / 1000); // current Unix timestamp
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    const startDate = Math.floor(sixMonthsAgo.getTime() / 1000); // Unix timestamp 6 months ago
-    
-    klines = await getHistoricalPricesSA(symbol, startDate, endDate)
+    const apikey = document.getElementById("apikey").value;
+        
+    klines = transformFIIResponse(await getHistoricalPricesSA(symbol, apikey))
     calculateAndPlotAll(klines);
 }
 
@@ -62,6 +76,30 @@ function transformKlinesResponse(response) {
         lowPrices.push(parseFloat(kline[3]));
         closePrices.push(parseFloat(kline[4]));
         dates.push(new Date(kline[0]));
+    }
+
+    return {
+        open: openPrices,
+        close: closePrices,
+        high: highPrices,
+        low: lowPrices,
+        date: dates,
+    };
+}
+
+function transformFIIResponse(response) {
+    const openPrices = [];
+    const closePrices = [];
+    const highPrices = [];
+    const lowPrices = [];
+    const dates = [];
+
+    for (let i = 0; i < response.length; i++) {
+        openPrices.push(parseFloat(response[i].open));
+        highPrices.push(parseFloat(response[i].high));
+        lowPrices.push(parseFloat(response[i].low));
+        closePrices.push(parseFloat(response[i].close));
+        dates.push(new Date(response[i].date));
     }
 
     return {
