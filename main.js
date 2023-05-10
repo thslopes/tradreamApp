@@ -16,7 +16,6 @@ async function getHistoricalPricesSA(symbol, apiKey) {
       throw new Error(data['Error Message']);
     }
 
-    debugger;
     const seriesKey = "Time Series (Daily)";
     const marketData = Object.entries(data[seriesKey]).map(([date, values]) => ({
       date,

@@ -13,16 +13,11 @@
 </head>
 
 <body>
-  <h1>FIIs</h1>
+  <h1>Carteira</h1>
   <form>
-    <input id="apikey"/>
-    <label for="symbol">Symbol:</label>
-    <select id="symbol">
-      <option value="XPCI11">XPCI11</option>
-      <option value="CPTS11">CPTS11</option>
-      <option value="KNCR11">KNCR11</option>
-    </select><br /><br />
-    <button type="button" onclick="doCalculateFII()">Calculate FII</button>
+    <input id="apikey" />
+    <br />
+    <button type="button" onclick="doEvolution()">Calculate FII</button>
   </form>
 
   <h2>Results</h2>
@@ -36,6 +31,7 @@
   <script src="./bbands.js"></script>
   <script src="./macdv.js"></script>
   <script src="./main.js"></script>
+  <script src="./wallet.js"></script>
 </body>
 
 </html>
