@@ -6,37 +6,40 @@ async function getKlines(symbol, interval) {
 }
 
 async function getHistoricalPricesSA(symbol, apiKey) {
-  const apiUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}.SA&apikey=${apiKey}`;
+    const apiUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}.SA&apikey=${apiKey}`;
 
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-    if (data['Error Message']) {
-      throw new Error(data['Error Message']);
+        if (data['Error Message']) {
+            throw new Error(data['Error Message']);
+        }
+
+        const seriesKey = "Time Series (Daily)";
+        const marketData = Object.entries(data[seriesKey]).map(([date, values]) => ({
+            date,
+            open: Number(values['1. open']),
+            high: Number(values['2. high']),
+            low: Number(values['3. low']),
+            close: Number(values['4. close']),
+            volume: Number(values['5. volume']),
+        }));
+
+        return marketData;
+    } catch (error) {
+        console.error(error);
     }
-
-    const seriesKey = "Time Series (Daily)";
-    const marketData = Object.entries(data[seriesKey]).map(([date, values]) => ({
-      date,
-      open: Number(values['1. open']),
-      high: Number(values['2. high']),
-      low: Number(values['3. low']),
-      close: Number(values['4. close']),
-      volume: Number(values['5. volume']),
-    }));
-
-    return marketData;
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 
 async function doCalculateFII() {
     const symbol = document.getElementById("symbol").value;
-    const apikey = document.getElementById("apikey").value;
-        
+    let apikey = document.getElementById("apikey").value;
+    if (apikey == "") {
+        apikey = getQueryParamValue("apiKey")
+    }
+
     klines = transformFIIResponse(await getHistoricalPricesSA(symbol, apikey))
     calculateAndPlotAll(klines);
 }
@@ -236,3 +239,7 @@ function calculateSmoothedMovingAverage(data, period) {
     return sma;
 }
 
+function getQueryParamValue(paramName) {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    return urlSearchParams.get(paramName);
+}

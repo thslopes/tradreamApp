@@ -1,14 +1,23 @@
 async function doEvolution() {
-    const apikey = document.getElementById("apikey").value;
-    
+    let apikey = document.getElementById("apikey").value;
+    if (apikey == "") {
+        apikey = getQueryParamValue("apiKey")
+    }
+
     const itens = [
         { symbol: "XPCI11", count: 29 },
         { symbol: "CPTS11", count: 30 },
         { symbol: "KNCR11", count: 25 },
+        { symbol: "PETR4", count: 71 },
+        { symbol: "ITUB4", count: 38 },
     ]
     for (let index = 0; index < itens.length; index++) {
         const element = itens[index];
-        element.klines = transformFIIResponse(await getHistoricalPricesSA(element.symbol, apikey));
+        element.task = getHistoricalPricesSA(element.symbol, apikey);
+    }
+    for (let index = 0; index < itens.length; index++) {
+        const element = itens[index];
+        element.klines = transformFIIResponse(await element.task);
     }
 
     const tudao = {
