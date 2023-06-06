@@ -201,7 +201,8 @@ function plotRSI(klines) {
 document.addEventListener("DOMContentLoaded", () => {
     if (fii == true) {
         doCalculateFII();
-
+    } else if (wallet == true) {
+        doEvolution();
     } else {
         doCalculate();
     }
