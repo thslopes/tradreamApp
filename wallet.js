@@ -39,6 +39,6 @@ async function doEvolution() {
         }
     });
 
-    calculateAndPlotAll(tudao);
+    plotCandles(tudao);
 }
 
