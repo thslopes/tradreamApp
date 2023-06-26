@@ -127,8 +127,14 @@ function plotCandles(klines) {
     };
 
     // Define the layout for the chart
+    var title = "";
+    if (document.getElementById("symbol") != undefined) {
+        title = document.getElementById("symbol").value;
+    } else {
+        title = "Wallet";
+    }
     var layout = {
-        title: document.getElementById("symbol").value,
+        title: title,
         showlegend: false,
         xaxis: {
             rangeslider: {
