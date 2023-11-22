@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Tradream</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
+  <link rel="stylesheet" href="./main.css">
+</head>
+
+<body>
+  <a href="./carteira.html">Carteira</a>
+  <h1>FIIs</h1>
+  <form>
+    <input id="apikey"/><br />
+    <label for="symbol">Symbol:</label>
+    <input id="symbol" /><br />
+    <a href="#" onclick="doCalculateStock('XPCI11')">XPCI11</a>
+    <a href="#" onclick="doCalculateStock('VGIR11')">VGIR11</a>
+    <a href="#" onclick="doCalculateStock('URPR11')">URPR11</a>
+    <a href="#" onclick="doCalculateStock('HCTR11')">HCTR11</a>
+    <a href="#" onclick="doCalculateStock('XPCA11')">XPCA11</a>
+    <a href="#" onclick="doCalculateStock('CPTS11')">CPTS11</a>
+    <a href="#" onclick="doCalculateStock('CPTR11')">CPTR11</a>
+    <a href="#" onclick="doCalculateStock('KNCR11')">KNCR11</a>
+    <a href="#" onclick="doCalculateStock('PETR4')">PETR4</a>
+    <a href="#" onclick="doCalculateStock('HABT11')">HABT11</a><br />
+    <button type="button" onclick="doCalculateStock('')">Calculate FII</button>
+  </form>
+
+  <h2>Results</h2>
+  <div id="candles"></div>
+  <div id="dividends"></div>
+  <div id="macdv"></div>
+  <div id="macdChart"></div>
+  <div id="rsi"></div>
+  <div id="bbands"></div>
+
+  <script src="./macd.js"></script>
+  <script src="./bbands.js"></script>
+  <script src="./macdv.js"></script>
+  <script src="./main.js"></script>
+  <script src="./cache.js"></script>
+  <script src="./stock.js"></script>
+</body>
+
+</html>

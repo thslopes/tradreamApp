@@ -1,0 +1,20 @@
+input, select, button {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+select {
+  -webkit-appearance: popup-menu;
+}
+
+button {
+  font-size: 16px;
+  padding: 10px 20px;
+}
+
+canvas,
+#chart_div,
+#rsi {
+  width: 100%;
+  height: auto;
+}

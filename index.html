@@ -1,14 +1,40 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Page Title</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='./main.css'>
-    <script src='./main.js'></script>
+  <meta charset="UTF-8" />
+  <title>Tradream</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
+  <script>
+    const fii = false;
+    const wallet = false;
+  </script>
+  <link rel="stylesheet" href="./main.css">
 </head>
+
 <body>
-    
+  <h1>Crypto</h1>
+  <form>
+    <label for="symbol">Symbol:</label>
+    <select id="symbol">
+      <option value="BTCBUSD">BTCBUSD</option>
+      <option value="ETHBUSD">ETHBUSD</option>
+    </select><br /><br />
+    <button type="button" onclick="doCalculate()">Calculate</button>
+  </form>
+
+  <h2>Results</h2>
+  <div id="candles"></div>
+  <div id="macdv"></div>
+  <div id="macdChart"></div>
+  <div id="rsi"></div>
+  <div id="bbands"></div>
+
+  <script src="./macd.js"></script>
+  <script src="./bbands.js"></script>
+  <script src="./macdv.js"></script>
+  <script src="./main.js"></script>
 </body>
+
 </html>
