@@ -23,7 +23,6 @@ async function doCalculateStock(symbol) {
     if (apikey == "") {
         apikey = getQueryParamValue("apiKey")
     }
-
     var klines = transformStockResponse(await getHistoricalPricesSA(symbol, apikey))
     klines = sortKlines(klines);
     calculateAndPlotAll(klines);
@@ -35,12 +34,24 @@ function plotDividends(dividends) {
     dividends = dividends.filter(d => d.dividend > 0);
     const dates = dividends.map(d => d.date);
     const amounts = dividends.map(d => d.dividend);
+    const percents = dividends.map(d => d.percent);
+    const maxPercent = Math.max(...percents);
 
-    const data = [{
+    const dividendAmounts = {
         x: dates,
         y: amounts,
-        type: 'bar'
-    }];
+        type: 'bar',
+        name: 'Dividendos',
+    };
+
+    const dividendPercents = {
+        x: dates,
+        y: percents,
+        type: 'scatter',
+        mode: 'lines',
+        yaxis: 'y2',
+        name: 'Percentual',
+    };
 
     const layout = {
         title: 'Dividendos',
@@ -50,10 +61,19 @@ function plotDividends(dividends) {
             zeroline: false
         },
         yaxis: {
-            title: 'Valor',
+            title: 'Dividendos',
             showline: false
+        },
+        yaxis2: {
+            overlaying: 'y',
+            side: 'right',
+            title: 'Dividendos',
+            showline: false,
+            range: [0, maxPercent]
         }
     };
+
+    const data = [dividendAmounts, dividendPercents]
 
     Plotly.newPlot('dividends', data, layout);
 }
@@ -61,8 +81,7 @@ function plotDividends(dividends) {
 async function getDividends(symbol, apiKey) {
     const apiUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}.SA&apikey=${apiKey}`;
     try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        const data = await fromCache(apiUrl);
 
         if (data['Error Message']) {
             throw new Error(data['Error Message']);
@@ -75,9 +94,13 @@ async function getDividends(symbol, apiKey) {
         const seriesKey = "Monthly Adjusted Time Series";
         for (const [date, values] of Object.entries(data[seriesKey])) {
             if (date >= yearAgo.toISOString().slice(0, 10)) {
+                const dividend = Number(values['7. dividend amount']);
+                const adjustedClose = Number(values['5. adjusted close']);
+                const percent = (dividend / adjustedClose) * 100;
                 dividends.push({
                     date: date,
-                    dividend: Number(values['7. dividend amount'])
+                    dividend,
+                    percent: percent
                 })
             }
         }
@@ -129,7 +152,7 @@ function transformStockResponse(response) {
     }
 
     var split = 1
-    var splitDate = new Date(2030,1,1).toISOString().slice(0, 10);
+    var splitDate = new Date(2030, 1, 1).toISOString().slice(0, 10);
     for (let i = 0; i < splits.length; i++) {
         if (splits[i].stock == stock) {
             split = splits[i].ratio;
@@ -139,7 +162,7 @@ function transformStockResponse(response) {
 
     for (let i = 0; i < response.length; i++) {
         var factor = 1;
-        
+
         const data = response[i];
         if (ignoreDates.includes(data.date)) {
             continue;
